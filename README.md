@@ -33,6 +33,7 @@ graph TB
         end
         DepositEvent[(Deposit Event)]:::eventStyle
     end
+
     subgraph KOPLI[REACTIVE-KOPLI CHAIN]
         subgraph Reactive[Reactive Layer]
             VaultBridge{Vault Bridge}:::reactiveStyle
@@ -54,6 +55,35 @@ graph TB
         MintEvent[(Mint Event)]:::eventStyle
         RepayEvent[(Repay Event)]:::eventStyle
     end
+
+    %% Flow connections
+    User -->|1| ETH_Start
+    ETH_Start -->|2| Deposit
+    User -->|3| TokenSelect
+    Deposit -->|4| DepositEvent
+    DepositEvent -->|5| VaultBridge
+    VaultBridge -->|6| BridgeMinter
+    BridgeMinter -->|7A| IVA
+    BridgeMinter -->|7B| CONST
+    IVA -->|8A| User
+    CONST -->|8B| User
+    BridgeMinter -->|9| MintEvent
+    MintEvent -->|10| LoanBridge
+    LoanBridge -->|11| LoanManager
+    User -->|12| LoanManager
+    LoanManager -->|13| RepayEvent
+    RepayEvent -->|14| RepayBridge
+    RepayBridge -->|15| Withdraw
+    Withdraw -->|16| ETH_End
+    ETH_End -->|17| User
+
+    %% Subgraph styling
+    style SEPOLIA fill:#FFF0F0,stroke:#FF9999,stroke-width:2px
+    style KOPLI fill:#F0F8FF,stroke:#99CCFF,stroke-width:2px
+    style Reactive fill:#FFF8F0,stroke:#FFB74D,stroke-width:2px
+    style Core fill:#FFFFFF,stroke:#333,stroke-width:2px
+    style Vault fill:#FFFFFF,stroke:#333,stroke-width:2px
+    style Tokens fill:#E3F2FD,stroke:#1E88E5,stroke-width:1px
 ```
 
 ## Smart Contracts
