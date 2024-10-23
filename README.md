@@ -11,7 +11,7 @@ This protocol implements a cross-chain lending system between Sepolia and Reacti
 ## Architecture
 
 ```mermaid
-graph TB
+graph TD
     %% Styling definitions
     classDef userStyle fill:#4A90E2,stroke:#2171B5,stroke-width:2px,color:#fff,rx:20
     classDef contractStyle fill:#fff,stroke:#333,stroke-width:1px,rx:5
@@ -19,44 +19,52 @@ graph TB
     classDef eventStyle fill:#E8F5E9,stroke:#81C784,stroke-width:1px,color:#2E7D32,rx:15
     classDef tokenStyle fill:#E3F2FD,stroke:#1E88E5,stroke-width:2px,rx:8
     classDef ethStyle fill:#CFD8DC,stroke:#607D8B,stroke-width:2px,rx:8
-    
-    %% Nodes
+
+    %% Main nodes
     User((User)):::userStyle
     ETH_Start[ETH]:::ethStyle
     ETH_End[ETH]:::ethStyle
-    
-    subgraph SEPOLIA[SEPOLIA CHAIN]
-        subgraph Vault[Vault Contract]
-            TokenSelect[Token Selection: IVA 5% / CONST 10%]:::contractStyle
+
+    %% SEPOLIA Chain
+    subgraph SEPOLIA[" SEPOLIA CHAIN "]
+        direction TB
+        subgraph Vault[" Vault Contract "]
+            direction TB
+            TokenSelect[Token Selection:<br/>IVA 5% / CONST 10%]:::contractStyle
             Deposit[Deposit ETH + Deadline]:::contractStyle
             Withdraw[Withdraw ETH]:::contractStyle
         end
         DepositEvent[(Deposit Event)]:::eventStyle
     end
 
-    subgraph KOPLI[REACTIVE-KOPLI CHAIN]
-        subgraph Reactive[Reactive Layer]
+    %% KOPLI Chain
+    subgraph KOPLI[" REACTIVE-KOPLI CHAIN "]
+        direction TB
+        subgraph Reactive[" Reactive Layer "]
+            direction LR
             VaultBridge{Vault Bridge}:::reactiveStyle
             LoanBridge{Loan Bridge}:::reactiveStyle
             RepayBridge{Repay Bridge}:::reactiveStyle
         end
-        
-        subgraph Core[Core Protocol]
+
+        subgraph Core[" Core Protocol "]
+            direction TB
             BridgeMinter[Bridge Minter]:::contractStyle
             
-            subgraph Tokens[Dynamic Tokens]
+            subgraph Tokens[" Dynamic Tokens "]
+                direction LR
                 IVA[IVA 5%]:::tokenStyle
                 CONST[CONST 10%]:::tokenStyle
             end
             
             LoanManager[Loan Manager]:::contractStyle
         end
-        
+
         MintEvent[(Mint Event)]:::eventStyle
         RepayEvent[(Repay Event)]:::eventStyle
     end
 
-    %% Flow connections
+    %% Connections
     User -->|1| ETH_Start
     ETH_Start -->|2| Deposit
     User -->|3| TokenSelect
