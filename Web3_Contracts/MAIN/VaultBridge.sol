@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "./IReactive.sol";
-import "./AbstractReactive.sol";
-import "./ISystemContract.sol";
+import "Web3_Contracts/IReactive.sol";
+import "Web3_Contracts/AbstractReactive.sol";
+import "Web3_Contracts/ISystemContract.sol";
 
 contract VaultBridge is IReactive, AbstractReactive {
     event Event(

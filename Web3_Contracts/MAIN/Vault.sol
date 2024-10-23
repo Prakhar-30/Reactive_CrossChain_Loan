@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./AbstractCallback.sol";
+import "Web3_Contracts/AbstractCallback.sol";
 
 
 contract Vault is AbstractCallback   {
