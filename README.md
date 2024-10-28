@@ -12,86 +12,67 @@ This protocol implements a cross-chain lending system between Sepolia and Reacti
 
 ```mermaid
 graph TD
-    %% Styling definitions
-    classDef userStyle fill:#4A90E2,stroke:#2171B5,stroke-width:2px,color:#fff,rx:20
-    classDef contractStyle fill:#fff,stroke:#333,stroke-width:1px,rx:5
-    classDef reactiveStyle fill:#FFF3E0,stroke:#FFB74D,stroke-width:2px,rx:10
-    classDef eventStyle fill:#E8F5E9,stroke:#81C784,stroke-width:1px,color:#2E7D32,rx:15
-    classDef tokenStyle fill:#E3F2FD,stroke:#1E88E5,stroke-width:2px,rx:8
-    classDef ethStyle fill:#CFD8DC,stroke:#607D8B,stroke-width:2px,rx:8
-
-    %% Main nodes
-    User((User)):::userStyle
-    ETH_Start[ETH]:::ethStyle
-    ETH_End[ETH]:::ethStyle
-
-    %% SEPOLIA Chain
-    subgraph SEPOLIA[" SEPOLIA CHAIN "]
-        direction TB
-        subgraph Vault[" Vault Contract "]
-            direction TB
-            TokenSelect[Token Selection:<br/>IVA 5% / CONST 10%]:::contractStyle
-            Deposit[Deposit ETH + Deadline]:::contractStyle
-            Withdraw[Withdraw ETH]:::contractStyle
+    subgraph Sepolia["Sepolia Network"]
+        MPW["MultiPartyWallet Contract"]
+        MC["Meme Coin Contract"]
+        
+        subgraph Wallet Operations
+            INIT["Initialize Wallet"]
+            CONTRIB["Contribute Funds"]
+            CLOSE["Close Wallet"]
+            SEND["Send Funds"]
+            LEAVE["Leave Wallet"]
         end
-        DepositEvent[(Deposit Event)]:::eventStyle
+        
+        subgraph Events
+            WC["WalletClosed Event"]
+            FR["FundsReceived Event"]
+            SL["ShareHolderLeft Event"]
+        end
+        
+        INIT --> MPW
+        CONTRIB --> MPW
+        CLOSE --> MPW
+        SEND --> MPW
+        LEAVE --> MPW
+        
+        MPW --> WC
+        MPW --> FR
+        MPW --> SL
+        
+        MC -->|Approve & Transfer| MPW
     end
-
-    %% KOPLI Chain
-    subgraph KOPLI[" REACTIVE-KOPLI CHAIN "]
-        direction TB
-        subgraph Reactive[" Reactive Layer "]
-            direction LR
-            VaultBridge{Vault Bridge}:::reactiveStyle
-            LoanBridge{Loan Bridge}:::reactiveStyle
-            RepayBridge{Repay Bridge}:::reactiveStyle
+    
+    subgraph Reactive-Kopli["Reactive-Kopli TestNetwork"]
+        MPWR["MultiPartyWalletReactive Contract"]
+        
+        subgraph Reactive Functions
+            US["updateShares()"]
+            DF["distributeFunds()"]
         end
-
-        subgraph Core[" Core Protocol "]
-            direction TB
-            BridgeMinter[Bridge Minter]:::contractStyle
-            
-            subgraph Tokens[" Dynamic Tokens "]
-                direction LR
-                IVA[IVA 5%]:::tokenStyle
-                CONST[CONST 10%]:::tokenStyle
-            end
-            
-            LoanManager[Loan Manager]:::contractStyle
-        end
-
-        MintEvent[(Mint Event)]:::eventStyle
-        RepayEvent[(Repay Event)]:::eventStyle
+        
+        WC ==>|Triggers| US
+        FR ==>|Triggers| DF
+        SL ==>|Triggers| US
+        
+        style MPWR fill:#f9f,stroke:#333,stroke-width:4px
     end
+    
+    %% Styling
+    classDef contract fill:#aaf,stroke:#333,stroke-width:2px,color:#000
+    classDef event fill:#ffa,stroke:#333,stroke-width:2px,color:#000
+    classDef operation fill:#afa,stroke:#333,stroke-width:2px,color:#000
+    
+    class MPW,MC,MPWR contract
+    class WC,FR,SL event
+    class INIT,CONTRIB,CLOSE,SEND,LEAVE,US,DF operation
 
-    %% Connections
-    User -->|1| ETH_Start
-    ETH_Start -->|2| Deposit
-    User -->|3| TokenSelect
-    Deposit -->|4| DepositEvent
-    DepositEvent -->|5| VaultBridge
-    VaultBridge -->|6| BridgeMinter
-    BridgeMinter -->|7A| IVA
-    BridgeMinter -->|7B| CONST
-    IVA -->|8A| User
-    CONST -->|8B| User
-    BridgeMinter -->|9| MintEvent
-    MintEvent -->|10| LoanBridge
-    LoanBridge -->|11| LoanManager
-    User -->|12| LoanManager
-    LoanManager -->|13| RepayEvent
-    RepayEvent -->|14| RepayBridge
-    RepayBridge -->|15| Withdraw
-    Withdraw -->|16| ETH_End
-    ETH_End -->|17| User
-
-    %% Subgraph styling
-    style SEPOLIA fill:#FFF0F0,stroke:#FF9999,stroke-width:2px
-    style KOPLI fill:#F0F8FF,stroke:#99CCFF,stroke-width:2px
-    style Reactive fill:#FFF8F0,stroke:#FFB74D,stroke-width:2px
-    style Core fill:#FFFFFF,stroke:#333,stroke-width:2px
-    style Vault fill:#FFFFFF,stroke:#333,stroke-width:2px
-    style Tokens fill:#E3F2FD,stroke:#1E88E5,stroke-width:1px
+    %% Style all text to be darker
+    style Sepolia fill:#fff,stroke:#333,color:#000
+    style Reactive-Kopli fill:#fff,stroke:#333,color:#000
+    style Wallet Operations fill:#fff,stroke:#333,color:#000
+    style Events fill:#fff,stroke:#333,color:#000
+    style Reactive Functions fill:#fff,stroke:#333,color:#000
 ```
 
 ## Smart Contracts
